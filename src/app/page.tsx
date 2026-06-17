@@ -399,12 +399,18 @@ const MainDashboard: React.FC = () => {
 
           <div>
             <h5 className="font-bold text-white mb-3 uppercase tracking-wider text-[10px]">Contact Desk</h5>
-            <ul className="space-y-2 text-muted-foreground text-[11px]">
-              <li className="flex items-center gap-1.5">
-                <Phone className="h-3.5 w-3.5 text-primary" /> +91 87654 32109
+            <ul className="space-y-3 text-muted-foreground text-[11px]">
+              <li className="flex items-start gap-1.5">
+                <Phone className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                <div className="flex flex-col gap-1">
+                  <span>+91 98455 16982</span>
+                  <span>+91 94490 83047</span>
+                  <span>+91 98452 21066</span>
+                  <span>+91 97310 80149</span>
+                </div>
               </li>
               <li className="flex items-center gap-1.5">
-                <Mail className="h-3.5 w-3.5 text-primary" /> trade@whitegoldcotton.com
+                <Mail className="h-3.5 w-3.5 text-primary shrink-0" /> basaveshwaracottonindustries@gmail.com
               </li>
             </ul>
           </div>
