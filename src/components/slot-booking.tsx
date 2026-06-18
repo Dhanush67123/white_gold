@@ -21,7 +21,7 @@ interface GatePassDetails {
   quantity: string;
   vehicle: string;
   dateStr: string;
-  timeSlotLabel: string;
+  timeSlotLabel?: string;
   estimatedValue: number;
 }
 
@@ -30,7 +30,6 @@ export const SlotBooking: React.FC = () => {
 
   // Form States
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [timeSlot, setTimeSlot] = useState<"morning" | "afternoon" | "evening" | "">("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [village, setVillage] = useState("");
@@ -42,23 +41,8 @@ export const SlotBooking: React.FC = () => {
   const [gatePassDetails, setGatePassDetails] = useState<GatePassDetails | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Simulated slot remaining capacity
-  const [slotCapacities, setSlotCapacities] = useState({
-    morning: 3,
-    afternoon: 0,
-    evening: 7,
-  });
-
   const handleDateSelect = (selectedDate: Date | undefined) => {
     setDate(selectedDate);
-    if (selectedDate) {
-      setSlotCapacities({
-        morning: Math.floor(Math.random() * 8),
-        afternoon: Math.floor(Math.random() * 4),
-        evening: Math.floor(Math.random() * 10),
-      });
-      setTimeSlot(""); // Reset selection
-    }
   };
 
 
@@ -67,10 +51,6 @@ export const SlotBooking: React.FC = () => {
 
     if (!date) {
       toast.error("Please select a delivery date.");
-      return;
-    }
-    if (!timeSlot) {
-      toast.error("Please select a time slot.");
       return;
     }
     if (!name || !phone || !village || !quantity) {
@@ -87,12 +67,6 @@ export const SlotBooking: React.FC = () => {
       const estimatedValue = Math.round(Number(quantity) * rawCottonBuyRate);
       const formattedDate = date ? date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
 
-      const timeSlotLabel = {
-        morning: "Morning Shift (08:00 AM - 12:00 PM)",
-        afternoon: "Afternoon Shift (12:00 PM - 04:00 PM)",
-        evening: "Evening Shift (04:00 PM - 08:00 PM)",
-      }[timeSlot];
-
       const details = {
         passId,
         name,
@@ -101,7 +75,6 @@ export const SlotBooking: React.FC = () => {
         quantity,
         vehicle: vehicle.toUpperCase(),
         dateStr: formattedDate,
-        timeSlotLabel,
         estimatedValue,
         createdAt: new Date().toISOString(),
       };
@@ -118,12 +91,6 @@ export const SlotBooking: React.FC = () => {
       toast.success("Delivery Slot booked successfully! Gate Pass generated.", {
         id: toastId,
       });
-
-      // Subtract from capacity
-      setSlotCapacities(prev => ({
-        ...prev,
-        [timeSlot]: Math.max(0, prev[timeSlot as keyof typeof prev] - 1)
-      }));
     } catch (err) {
       console.error(err);
       toast.error("Failed to book slot. Please try again.", {
@@ -199,86 +166,6 @@ export const SlotBooking: React.FC = () => {
                 </button>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Time slots */}
-        <div>
-          <label className="text-[10px] uppercase font-extrabold text-muted-foreground tracking-widest block mb-2">
-            Available Time Slots
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {/* Morning */}
-            <button
-              type="button"
-              disabled={slotCapacities.morning === 0}
-              onClick={() => setTimeSlot("morning")}
-              className={`p-2.5 text-center rounded-xl border flex flex-col justify-between h-18 transition-all duration-200 ${
-                timeSlot === "morning"
-                  ? "bg-primary/15 border-primary/50 text-white"
-                  : slotCapacities.morning === 0
-                  ? "bg-red-500/5 border-red-500/10 text-muted-foreground opacity-50 cursor-not-allowed"
-                  : "bg-secondary/20 border-border/50 text-muted-foreground hover:bg-secondary/40 hover:text-white"
-              }`}
-            >
-              <span className="text-[10px] font-bold block">Morning</span>
-              <span className="text-[9px] font-medium block text-muted-foreground mt-0.5">08:00 - 12:00</span>
-              <Badge variant="outline" className={`mt-1.5 px-1 py-0.5 text-[8px] border-0 mx-auto font-bold ${
-                slotCapacities.morning === 0
-                  ? "bg-red-500/10 text-red-400"
-                  : "bg-emerald-500/10 text-emerald-400"
-              }`}>
-                {slotCapacities.morning === 0 ? "Full" : `${slotCapacities.morning} Left`}
-              </Badge>
-            </button>
-
-            {/* Afternoon */}
-            <button
-              type="button"
-              disabled={slotCapacities.afternoon === 0}
-              onClick={() => setTimeSlot("afternoon")}
-              className={`p-2.5 text-center rounded-xl border flex flex-col justify-between h-18 transition-all duration-200 ${
-                timeSlot === "afternoon"
-                  ? "bg-primary/15 border-primary/50 text-white"
-                  : slotCapacities.afternoon === 0
-                  ? "bg-red-500/5 border-red-500/10 text-muted-foreground opacity-50 cursor-not-allowed"
-                  : "bg-secondary/20 border-border/50 text-muted-foreground hover:bg-secondary/40 hover:text-white"
-              }`}
-            >
-              <span className="text-[10px] font-bold block">Afternoon</span>
-              <span className="text-[9px] font-medium block text-muted-foreground mt-0.5">12:00 - 16:00</span>
-              <Badge variant="outline" className={`mt-1.5 px-1 py-0.5 text-[8px] border-0 mx-auto font-bold ${
-                slotCapacities.afternoon === 0
-                  ? "bg-red-500/10 text-red-400"
-                  : "bg-emerald-500/10 text-emerald-400"
-              }`}>
-                {slotCapacities.afternoon === 0 ? "Full" : `${slotCapacities.afternoon} Left`}
-              </Badge>
-            </button>
-
-            {/* Evening */}
-            <button
-              type="button"
-              disabled={slotCapacities.evening === 0}
-              onClick={() => setTimeSlot("evening")}
-              className={`p-2.5 text-center rounded-xl border flex flex-col justify-between h-18 transition-all duration-200 ${
-                timeSlot === "evening"
-                  ? "bg-primary/15 border-primary/50 text-white"
-                  : slotCapacities.evening === 0
-                  ? "bg-red-500/5 border-red-500/10 text-muted-foreground opacity-50 cursor-not-allowed"
-                  : "bg-secondary/20 border-border/50 text-muted-foreground hover:bg-secondary/40 hover:text-white"
-              }`}
-            >
-              <span className="text-[10px] font-bold block">Evening</span>
-              <span className="text-[9px] font-medium block text-muted-foreground mt-0.5">16:00 - 20:00</span>
-              <Badge variant="outline" className={`mt-1.5 px-1 py-0.5 text-[8px] border-0 mx-auto font-bold ${
-                slotCapacities.evening === 0
-                  ? "bg-red-500/10 text-red-400"
-                  : "bg-emerald-500/10 text-emerald-400"
-              }`}>
-                {slotCapacities.evening === 0 ? "Full" : `${slotCapacities.evening} Left`}
-              </Badge>
-            </button>
           </div>
         </div>
 
@@ -398,7 +285,9 @@ export const SlotBooking: React.FC = () => {
                 <div className="col-span-2 border-t border-border/20 pt-3">
                   <span className="text-[9px] uppercase font-semibold text-muted-foreground tracking-widest block mb-0.5">Scheduled Delivery</span>
                   <span className="font-bold text-white/95">{gatePassDetails.dateStr}</span>
-                  <span className="block text-[10px] font-bold text-primary mt-0.5">{gatePassDetails.timeSlotLabel}</span>
+                  {gatePassDetails.timeSlotLabel && (
+                    <span className="block text-[10px] font-bold text-primary mt-0.5">{gatePassDetails.timeSlotLabel}</span>
+                  )}
                 </div>
                 <div className="col-span-2 border-t border-border/20 pt-3 flex justify-between items-baseline">
                   <div>

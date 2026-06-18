@@ -39,7 +39,7 @@ interface Booking {
   quantity: string;
   vehicle: string;
   dateStr: string;
-  timeSlotLabel: string;
+  timeSlotLabel?: string;
   estimatedValue: number;
   createdAt: string;
 }
@@ -450,9 +450,11 @@ export default function AdminDashboard() {
                         <TableCell className="py-4">
                           <div className="flex flex-col gap-0.5">
                             <span className="font-bold text-white/95">{b.dateStr}</span>
-                            <span className="text-[10px] text-primary font-bold flex items-center gap-1">
-                              <Clock className="h-3 w-3" /> {b.timeSlotLabel}
-                            </span>
+                            {b.timeSlotLabel && (
+                              <span className="text-[10px] text-primary font-bold flex items-center gap-1">
+                                <Clock className="h-3 w-3" /> {b.timeSlotLabel}
+                              </span>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="py-4 font-bold text-white">
@@ -777,7 +779,9 @@ export default function AdminDashboard() {
                   <div className="col-span-2 border-t border-border/20 pt-3">
                     <span className="text-[9px] uppercase font-semibold text-muted-foreground tracking-widest block mb-0.5">Scheduled Delivery</span>
                     <span className="font-bold text-white/95">{selectedBookingForPass.dateStr}</span>
-                    <span className="block text-[10px] font-bold text-primary mt-0.5">{selectedBookingForPass.timeSlotLabel}</span>
+                    {selectedBookingForPass.timeSlotLabel && (
+                      <span className="block text-[10px] font-bold text-primary mt-0.5">{selectedBookingForPass.timeSlotLabel}</span>
+                    )}
                   </div>
                   <div className="col-span-2 border-t border-border/20 pt-3 flex justify-between items-baseline">
                     <div>
